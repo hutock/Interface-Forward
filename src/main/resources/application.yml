@@ -1,0 +1,15 @@
+server:
+  port: 18080
+
+
+forward-interface:
+  hostname:
+    http://rio.wuhan.gov.cn
+  paasId:
+    secret
+  paasToken:
+    secret
+
+
+
+

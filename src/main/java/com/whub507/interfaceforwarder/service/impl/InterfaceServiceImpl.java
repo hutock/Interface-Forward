@@ -84,42 +84,42 @@ public class InterfaceServiceImpl implements InterfaceService {
                 paramList.add(line);
             }
             reader.close();
-//            for (String s : paramList) {
-//                res.addAll(Post(s, interfaceNum, paramName));
-//                if (res.size() > 30)
-//                    break;
-//            }
-//        } catch (NoSuchAlgorithmException | IOException e) {
-//            return ResResult.error(508, "出现错误,错误信息:"+e.getMessage());
-//        }
-        }catch (IOException e){
+            for (String s : paramList) {
+                res.addAll(Post(s, interfaceNum, paramName));
+                if (res.size() > 30)
+                    break;
+            }
+        } catch (NoSuchAlgorithmException | IOException e) {
             return ResResult.error(508, "出现错误,错误信息:"+e.getMessage());
         }
+//        }catch (IOException e){
+//            return ResResult.error(508, "出现错误,错误信息:"+e.getMessage());
+//        }
 
-//        return ResResult.ok(res.stream().limit(30).collect(Collectors.toList()), interfaceConfig.getInterfaceFields().get(interfaceNum), "查询成功，返回至多前三十条数据");
-        StringBuilder msg = new StringBuilder();
-        paramList.forEach(msg::append);
-        return ResResult.ok(test().getData(), interfaceConfig.getInterfaceFields().get(interfaceNum), "传入参数文件为:"+ msg);
+        return ResResult.ok(res.stream().limit(30).collect(Collectors.toList()), interfaceConfig.getInterfaceFields().get(interfaceNum), "查询成功，返回至多前三十条数据");
+//        StringBuilder msg = new StringBuilder();
+//        paramList.forEach(msg::append);
+//        return ResResult.ok(test().getData(), interfaceConfig.getInterfaceFields().get(interfaceNum), "传入参数文件为:"+ msg);
     }
 
     @Override
     public ResResult<List<Object>> interfaceByParams(String param, Integer interfaceNum, String paramName) {
         param = param == null ? "" : param;
         List<Object> res = new ArrayList<>();
-        res = test().getData();
-        return ResResult.ok(res, interfaceConfig.getInterfaceFields().get(interfaceNum), "测试：接受参数为（"+paramName+","+param+","+interfaceNum+")");
-//        try {
-//            res = Post(param, interfaceNum, paramName);
-//        } catch (NoSuchAlgorithmException e){
-//            return ResResult.error(508, "出现错误,错误信息:"+e.getMessage());
-//        }
-//
-//        //处理数据过多
-//        if (res.size() > 30){
-//            res = res.subList(0, 30);
-//        }
-//
-//        return ResResult.ok(res, interfaceConfig.getInterfaceFields().get(interfaceNum), "查询成功，返回至多前三十条数据");
+//        res = test().getData();
+//        return ResResult.ok(res, interfaceConfig.getInterfaceFields().get(interfaceNum), "测试：接受参数为（"+paramName+","+param+","+interfaceNum+")");
+        try {
+            res = Post(param, interfaceNum, paramName);
+        } catch (NoSuchAlgorithmException e){
+            return ResResult.error(508, "出现错误,错误信息:"+e.getMessage());
+        }
+
+        //处理数据过多
+        if (res.size() > 30){
+            res = res.subList(0, 30);
+        }
+
+        return ResResult.ok(res, interfaceConfig.getInterfaceFields().get(interfaceNum), "查询成功，返回至多前三十条数据");
     }
 
     @Override
@@ -127,24 +127,24 @@ public class InterfaceServiceImpl implements InterfaceService {
         List<Object> list = new ArrayList<>();
         try(Workbook workbook=new XSSFWorkbook()){
             // Post(param, interfaceNum, paramName)
-//            List<String> paramList = new ArrayList<>();
-//
-//            InputStream inputStream = file.getInputStream();
-//            Charset charset =  Charset.forName(new InputStreamReader(inputStream).getEncoding());
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-//
-//            String line;
-//            System.out.println("读取文件：");
-//            while ((line = reader.readLine()) != null) {
-//                line = new String(line.getBytes(charset), StandardCharsets.UTF_8);
-//                System.out.println(line);
-//                paramList.add(line);
-//            }
-//            reader.close();
-//            for (String s : paramList) {
-//                list.addAll(Post(s, interfaceNum, paramName));
-//            }
-            list = this.test().getData();
+            List<String> paramList = new ArrayList<>();
+
+            InputStream inputStream = file.getInputStream();
+            Charset charset =  Charset.forName(new InputStreamReader(inputStream).getEncoding());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            System.out.println("读取文件：");
+            while ((line = reader.readLine()) != null) {
+                line = new String(line.getBytes(charset), StandardCharsets.UTF_8);
+                System.out.println(line);
+                paramList.add(line);
+            }
+            reader.close();
+            for (String s : paramList) {
+                list.addAll(Post(s, interfaceNum, paramName));
+            }
+//            list = this.test().getData();
             String title = interfaceConfig.getInterfaceTitles().get(interfaceNum);
 
             createTable(title, interfaceNum, workbook, list);
@@ -161,6 +161,7 @@ public class InterfaceServiceImpl implements InterfaceService {
             workbook.close();
             outputStream.close();
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -170,12 +171,12 @@ public class InterfaceServiceImpl implements InterfaceService {
     public Boolean downloadByParam(HttpServletRequest request, HttpServletResponse response, String param, Integer interfaceNum, String paramName) {
         List<Object> list = new ArrayList<>();
         try(Workbook workbook=new XSSFWorkbook()){
-//            list = Post(param, interfaceNum, paramName);
-            list = this.test().getData();
+            list = Post(param, interfaceNum, paramName);
+//            list = this.test().getData();
             String title = interfaceConfig.getInterfaceTitles().get(interfaceNum);
-
+//            System.out.println("开始建表");
             createTable(title, interfaceNum, workbook, list);
-            
+            System.out.println("建表成功");
 //            response.setContentType("application/vnd.ms-excel;charset=utf-8");
             response.setHeader("content-disposition", "attachment; filename=" + URLEncoder.encode(title+".xlsx", "UTF-8"));
             // 获取输出流
@@ -188,6 +189,7 @@ public class InterfaceServiceImpl implements InterfaceService {
             workbook.close();
             outputStream.close();
         }catch (Exception e){
+            System.out.println(e.getMessage());
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -228,7 +230,7 @@ public class InterfaceServiceImpl implements InterfaceService {
         Sheet sheet=workbook.createSheet(title);
         Row header=sheet.createRow(0);
 
-        List<Field> fields = interfaceConfig.getInterfaceFields().get(14);
+        List<Field> fields = interfaceConfig.getInterfaceFields().get(interfaceNum);
 
         JSONObject jso = (JSONObject) list.get(0);
         int i = 0;
@@ -237,9 +239,9 @@ public class InterfaceServiceImpl implements InterfaceService {
             header.createCell(i).setCellValue(fields.stream().filter(o -> o.getProp().equals(key)).findFirst().get().getLabel());
             i++;
         }
-
+//        System.out.println("header");
         for (int j = 0; j < list.size(); j++) {
-            Row row = sheet.createRow(j+1);
+            Row row = sheet.createRow(j + 1);
             JSONObject jsonObject = (JSONObject) list.get(j);
             int k = 0;
             for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
